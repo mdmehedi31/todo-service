@@ -7,3 +7,18 @@ google:
   redirect_uri: ${GOOGLE_REDIRECT_URI}
   application_name: ${GOOGLE_APPLICATION_NAME}
   google_scopes: ${GOOGLE_SCOPES}
+
+spring:
+  datasource:
+    username: ${DBUSERNAME}
+    password: ${DBPASSWORD}
+    url: ${SOURCEURL}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  ai:
+   openai:
+    api-key : ${SPRING_OPEN_AI_KEY}
+    organization-id : ${SPRING_OPEN_AI_ORG_ID}
+    project-id : ${SPRING_OPEN_AI_PROJECT_ID}
+   chat:
+     client:
+       enabled: true
