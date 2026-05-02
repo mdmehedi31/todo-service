@@ -103,4 +103,14 @@ public class TodoListDBService implements ITodoListDBService {
             throw e;
         }
     }
+
+    @Override
+    public boolean addAllTOdoLists(List<TodoListEntity> todoListEntities) {
+        try{
+            this.todoListRepository.saveAll(todoListEntities);
+            return true;
+        }catch (Exception e) {
+            throw e;
+        }
+    }
 }

@@ -16,4 +16,5 @@ public interface ITodoListDBService {
     public List<TodoListEntity> getTodoListByTodoIdAndTitle(Integer todoListId, String title);
     public TodoListEntity getTodoListById(Integer todoListId);
     public boolean deleteTodoListByTodoId(Integer todoId);
+    public boolean addAllTOdoLists(List<TodoListEntity> todoListEntities);
 }

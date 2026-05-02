@@ -8,6 +8,8 @@ import com.todo.core.exceptionhandler.InvalidInputException;
 import com.todo.core.exceptionhandler.NotFoundException;
 import com.todom.library.dto.*;
 import com.todom.library.enums.SuccessOrFailedEnum;
+import com.todom.library.enums.TodoType;
+import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +17,7 @@ import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -233,6 +236,60 @@ public class TodoService implements ITodoService{
         } catch (Exception e) {
             throw e;
         }
+    }
+
+    @Transactional(rollbackOn = {Exception.class, InvalidInputException.class})
+    @Override
+    public ApiResponse addAiGeneratedTodoList(TodoDTO todoDTO, Integer createdBy) {
+        try{
+            if(todoDTO==null || todoDTO.getTitle()==null || todoDTO.getTitle().isBlank()){
+                throw new InvalidInputException("Todo can't be empty");
+            }
+
+            List<TodoEntity> todoEntityList = this.todoDBService.getAllTodoByUserId(createdBy);
+            Integer sortIndex=1;
+            if(todoEntityList != null && todoEntityList.size()>0){
+                log.debug("When todo entity list is not null and size is grater the 0");
+                sortIndex=todoEntityList.size()+1;
+                log.debug("Sort index value is : {}", sortIndex);
+            }
+
+            TodoEntity todoEntity= new TodoEntity();
+            todoEntity.setTitle(todoDTO.getTitle());
+            todoEntity.setTodoType(TodoType.AI_GENERATED);
+            todoEntity.setSortIndex(sortIndex);
+            todoEntity.setCreatedOn(Instant.now());
+            todoEntity.setIsDeleted(false);
+            todoEntity.setCreatedById(createdBy);
+
+            todoEntity= this.todoDBService.addTodo(todoEntity);
+
+            if(todoEntity!=null){
+
+                List<TodoListEntity> todoListEntityList = new ArrayList<>();
+                int sortOrder =1;
+                for (String items : todoDTO.getTodoList()){
+
+                    TodoListEntity todoListEntity = new TodoListEntity();
+                    todoListEntity.setTodoId(todoEntity.getId());
+                    todoListEntity.setCreatedBy(createdBy);
+                    todoListEntity.setCreatedOn(Instant.now());
+                    todoListEntity.setTitle(items);
+                    todoListEntity.setSortOrder(sortOrder);
+                    todoListEntity.setIsDeleted(false);
+                    sortIndex++;
+                    todoListEntityList.add(todoListEntity);
+                }
+                this.todoListDBService.addAllTOdoLists(todoListEntityList);
+                return new ApiResponse(SuccessOrFailedEnum.SUCCESS);
+            }
+
+            return new ApiResponse(SuccessOrFailedEnum.FAILED);
+        }catch (Exception e) {
+            log.error("An Exception thrown : ",e);
+            return new ApiResponse(SuccessOrFailedEnum.FAILED);
+        }
+
     }
 
     private TodoListResponseDTO  convertTodoListEntityToTodoResponseDTO(TodoListEntity todoListEntity) {

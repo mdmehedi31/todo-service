@@ -66,4 +66,9 @@ public class TodoController {
         return  new ResponseEntity<>(todoListResponse, HttpStatus.OK);
     }
 
+    @PostMapping("/add-ai-generated-todo/{createdById}")
+    public ResponseEntity<ApiResponse> addAiGeneratedTodo(@RequestBody TodoDTO todoDTO, @PathVariable Integer createdById) {
+        ApiResponse response = this.todoService.addAiGeneratedTodoList(todoDTO,createdById);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 }

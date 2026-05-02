@@ -17,4 +17,6 @@ public interface ITodoService {
     public ApiResponse deleteTodoList(Integer todoListId);
     public List<TodoListResponseDTO> getAllTodoListByTodoId(Integer todoId);
 
+    public ApiResponse addAiGeneratedTodoList(TodoDTO todoDTO, Integer createdById);
+
 }

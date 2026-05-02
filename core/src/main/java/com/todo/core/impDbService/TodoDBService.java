@@ -80,7 +80,7 @@ public class TodoDBService implements ITodoDBService {
 
             String sql="select id id, created_on createdOn, goal_end_date goalEndDate, goal_start_date goalStartDate, todo_title title, todo_type todoType, sort_index sortIndex\n" +
                     "from "+ DBUtils.TB_TODO +" where created_by_id ="+userId+" and (is_deleted is null or is_deleted = false) order by sort_index asc;";
-            log.debug("Get all todos by creator SQL is : "+sql);
+            log.info("Get all todos by creator SQL is : "+sql);
 
             List<TodoResponseDTO> todoList= jdbcTemplate.query(sql,new BeanPropertyRowMapper<TodoResponseDTO>(TodoResponseDTO.class));
             return todoList;
