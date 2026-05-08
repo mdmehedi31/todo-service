@@ -17,6 +17,7 @@ import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -263,6 +264,9 @@ public class TodoService implements ITodoService{
             todoEntity.setCreatedOn(Instant.now());
             todoEntity.setIsDeleted(false);
             todoEntity.setCreatedById(createdBy);
+            todoEntity.setGoalStartDate(Instant.now());
+            todoEntity.setGoalEndDate(Instant.now().plus(10, ChronoUnit.DAYS));
+
 
             todoEntity= this.todoDBService.addTodo(todoEntity);
 
