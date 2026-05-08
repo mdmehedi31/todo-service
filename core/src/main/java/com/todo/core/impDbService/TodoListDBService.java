@@ -4,7 +4,7 @@ import com.todo.core.dbservice.ITodoListDBService;
 import com.todo.core.entity.TodoListEntity;
 import com.todo.core.repository.ITodoListRepository;
 import com.todo.core.utils.DBUtils;
-import com.todom.library.dto.TodoListResponseDTO;
+import com.todom.library.dto.TodoListRequestDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,12 +44,12 @@ public class TodoListDBService implements ITodoListDBService {
     }
 
     @Override
-    public List<TodoListResponseDTO> getTodoListByTodoId(Integer todoId) {
+    public List<TodoListRequestDTO> getTodoListByTodoId(Integer todoId) {
         try{
             String sql = "select id id,todo_id todoId, title title, is_deleted isDeleted,\n" +
                     "todo_bg_color todoBgColor,created_by createdBy, sort_order sortOrder,created_on createdOn" +
                     " from "+ DBUtils.TB_TODO_LIST +" where todo_id ="+todoId+" and is_deleted=0;";
-            List<TodoListResponseDTO> todoListResponse = jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(TodoListResponseDTO.class));
+            List<TodoListRequestDTO> todoListResponse = jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(TodoListRequestDTO.class));
 
             log.info("the sql is : "+sql);
             return todoListResponse;

@@ -12,10 +12,10 @@ public interface ITodoService {
     public ApiResponse deleteTodo(Integer todoId);
 
     // TODOD List CRUE
-    public TodoListResponseDTO createTodoList(TodoListRequestDTO todoListRequestDTO);
-    public TodoListResponseDTO updateTodoList(TodoListRequestDTO todoListRequestDTO);
+    public TodoListRequestDTO createTodoList(TodoListRequestDTO todoListRequestDTO);
+    public TodoListRequestDTO updateTodoList(TodoListRequestDTO todoListRequestDTO);
     public ApiResponse deleteTodoList(Integer todoListId);
-    public List<TodoListResponseDTO> getAllTodoListByTodoId(Integer todoId);
+    public List<TodoListRequestDTO> getAllTodoListByTodoId(Integer todoId);
 
     public ApiResponse addAiGeneratedTodoList(TodoDTO todoDTO, Integer createdById);
 

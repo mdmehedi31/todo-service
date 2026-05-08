@@ -143,7 +143,7 @@ public class TodoService implements ITodoService{
 
     // Todo list from here
     @Override
-    public TodoListResponseDTO createTodoList(TodoListRequestDTO todoListRequestDTO) {
+    public TodoListRequestDTO createTodoList(TodoListRequestDTO todoListRequestDTO) {
         try{
             log.info("When createing todolist");
             if(todoListRequestDTO.getTodoId()==null){
@@ -178,10 +178,10 @@ public class TodoService implements ITodoService{
             todoListEntity= convertTodoListRequestToEntity(todoListEntity,todoListRequestDTO);
             TodoListEntity saveTodoList = this.todoListDBService.createTodoList(todoListEntity);
             if(saveTodoList!=null){
-                TodoListResponseDTO  todoListResponseDTO= convertTodoListEntityToTodoResponseDTO(saveTodoList);
+                TodoListRequestDTO  todoListResponseDTO= convertTodoListEntityToTodoResponseDTO(saveTodoList);
                 return todoListResponseDTO;
             }
-            return new TodoListResponseDTO();
+            return new TodoListRequestDTO();
         } catch (NotFoundException e) {
             throw e;
         } catch (InvalidInputException e) {
@@ -192,7 +192,7 @@ public class TodoService implements ITodoService{
     }
 
     @Override
-    public TodoListResponseDTO updateTodoList(TodoListRequestDTO todoListRequestDTO) {
+    public TodoListRequestDTO updateTodoList(TodoListRequestDTO todoListRequestDTO) {
         try{
             if(todoListRequestDTO.getId() ==null){
                 throw new InvalidInputException("Todo list id can't be empty");
@@ -230,7 +230,7 @@ public class TodoService implements ITodoService{
     }
 
     @Override
-    public List<TodoListResponseDTO> getAllTodoListByTodoId(Integer todoId) {
+    public List<TodoListRequestDTO> getAllTodoListByTodoId(Integer todoId) {
         try {
             return this.todoListDBService.getTodoListByTodoId(todoId);
         } catch (Exception e) {
@@ -292,8 +292,8 @@ public class TodoService implements ITodoService{
 
     }
 
-    private TodoListResponseDTO  convertTodoListEntityToTodoResponseDTO(TodoListEntity todoListEntity) {
-        TodoListResponseDTO responseDTO = new TodoListResponseDTO();
+    private TodoListRequestDTO  convertTodoListEntityToTodoResponseDTO(TodoListEntity todoListEntity) {
+        TodoListRequestDTO responseDTO = new TodoListRequestDTO();
         responseDTO.setId(todoListEntity.getId());
         responseDTO.setTodoId(todoListEntity.getTodoId());
         responseDTO.setTitle(todoListEntity.getTitle());

@@ -43,14 +43,14 @@ public class TodoController {
 
     //Todo List Api
     @PostMapping("/create-todolist")
-    public ResponseEntity<TodoListResponseDTO> createTodoList(@RequestBody TodoListRequestDTO todoListRequestDTO) {
-        TodoListResponseDTO todoListResponseDTO = todoService.createTodoList(todoListRequestDTO);
+    public ResponseEntity<TodoListRequestDTO> createTodoList(@RequestBody TodoListRequestDTO todoListRequestDTO) {
+        TodoListRequestDTO todoListResponseDTO = todoService.createTodoList(todoListRequestDTO);
         return  new ResponseEntity<>(todoListResponseDTO, HttpStatus.CREATED);
     }
 
     @PutMapping("/update-todolist")
-    public ResponseEntity<TodoListResponseDTO> updateTodoList(@RequestBody TodoListRequestDTO todoListRequestDTO) {
-        TodoListResponseDTO todoListResponseDTO= todoService.updateTodoList(todoListRequestDTO);
+    public ResponseEntity<TodoListRequestDTO> updateTodoList(@RequestBody TodoListRequestDTO todoListRequestDTO) {
+        TodoListRequestDTO todoListResponseDTO= todoService.updateTodoList(todoListRequestDTO);
         return  new ResponseEntity<>(todoListResponseDTO, HttpStatus.OK);
     }
 
@@ -61,8 +61,8 @@ public class TodoController {
     }
 
     @GetMapping("/get-todolist/{todoId}")
-    public ResponseEntity<List<TodoListResponseDTO>> getTodoList(@PathVariable Integer todoId) {
-        List<TodoListResponseDTO> todoListResponse = this.todoService.getAllTodoListByTodoId(todoId);
+    public ResponseEntity<List<TodoListRequestDTO>> getTodoList(@PathVariable Integer todoId) {
+        List<TodoListRequestDTO> todoListResponse = this.todoService.getAllTodoListByTodoId(todoId);
         return  new ResponseEntity<>(todoListResponse, HttpStatus.OK);
     }
 
