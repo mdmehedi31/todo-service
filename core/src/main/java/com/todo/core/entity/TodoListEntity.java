@@ -30,6 +30,8 @@ public class TodoListEntity extends AbstractIdEntity{
     @Column(name = "is_deleted")
     private boolean isDeleted;
 
+    private Boolean isDone;
+
     public Integer getTodoId() {
         return todoId;
     }
@@ -84,5 +86,13 @@ public class TodoListEntity extends AbstractIdEntity{
 
     public void setIsDeleted(boolean deleted) {
         isDeleted = deleted;
+    }
+
+    public Boolean getIsDone() {
+        return isDone;
+    }
+
+    public void setIsDone(Boolean done) {
+        isDone = done;
     }
 }

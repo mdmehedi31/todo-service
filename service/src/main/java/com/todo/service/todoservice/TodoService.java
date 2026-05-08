@@ -197,6 +197,8 @@ public class TodoService implements ITodoService{
             if(todoListRequestDTO.getId() ==null){
                 throw new InvalidInputException("Todo list id can't be empty");
             }
+
+            log.info("Update todolist ");
             TodoListEntity todoListEntity = this.todoListDBService.getTodoListById(todoListRequestDTO.getId());
             todoListEntity = convertTodoListRequestToEntity(todoListEntity,todoListRequestDTO);
             TodoListEntity saveTodoList = this.todoListDBService.updateTodoList(todoListEntity);
@@ -312,6 +314,9 @@ public class TodoService implements ITodoService{
         if(todoListRequestDTO !=null && todoListRequestDTO.getTodoBgColor()!=null && !todoListRequestDTO.getTodoBgColor().isBlank()){
             todoListEntity.setTodoBgColor(todoListRequestDTO.getTodoBgColor());
         }
+
+        todoListEntity.setIsDone(todoListRequestDTO.getIsDone());
+
         return todoListEntity;
     }
 

@@ -48,7 +48,7 @@ public class TodoListDBService implements ITodoListDBService {
         try{
             String sql = "select id id,todo_id todoId, title title, is_deleted isDeleted,\n" +
                     "todo_bg_color todoBgColor,created_by createdBy, sort_order sortOrder,created_on createdOn" +
-                    " from "+ DBUtils.TB_TODO_LIST +" where todo_id ="+todoId+" and is_deleted=0;";
+                    ", is_done isDone from "+ DBUtils.TB_TODO_LIST +" where todo_id ="+todoId+" and is_deleted=0;";
             List<TodoListRequestDTO> todoListResponse = jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(TodoListRequestDTO.class));
 
             log.info("the sql is : "+sql);
