@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -70,5 +71,12 @@ public class TodoController {
     public ResponseEntity<ApiResponse> addAiGeneratedTodo(@RequestBody TodoDTO todoDTO, @PathVariable Integer createdById) {
         ApiResponse response = this.todoService.addAiGeneratedTodoList(todoDTO,createdById);
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/get-all-dashboard-data/{startDate}/{endDate}/{userId}")
+    public ResponseEntity<DashBoardDTO> getAllDashBoard(@PathVariable LocalDate startDate, @PathVariable LocalDate endDate,
+                                                        @PathVariable Integer userId) {
+        DashBoardDTO respone = this.todoService.getDashboardDataWithinDate(startDate, endDate,userId);
+        return new ResponseEntity<>(respone, HttpStatus.OK);
     }
 }

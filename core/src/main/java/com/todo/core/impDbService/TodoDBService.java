@@ -95,35 +95,44 @@ public class TodoDBService implements ITodoDBService {
     }
 
 
-    public Integer getTotalDoneTodosAmount(LocalDate goalStartDate, LocalDate goalEndDate){
+    public void getTotalDoneTodosAmount(LocalDate goalStartDate, LocalDate goalEndDate, Integer userId,DashBoardDTO dashBoardDTO){
         try{
-            String sql ="select td.id from tb_todo td inner join \n" +
+            String sql ="select count(tdl.id) totalTodoItems, \n" +
+                    "sum(if(tdl.is_done is null or tdl.is_done =0, 0,1)) totalDoneItems from tb_todo td inner join \n" +
                     "tb_todo_list tdl on td.id = tdl.todo_id\n" +
                     "WHERE (date(td.goal_start_date) >= date('"+goalStartDate+"') OR td.goal_start_date IS NULL)\n" +
                     "  AND ( date(td.goal_end_date) <= date('"+goalEndDate+"') OR td.goal_end_date IS NULL) \n" +
-                    "group by tdl.todo_id\n" +
-                    "having count(tdl.id)= count(tdl.is_done);";
+                    " and td.created_by_id = "+userId;
 
+            log.info("Total done todos amount SQL is : "+sql);
 
-            List<TodoResponseDTO> todoList= jdbcTemplate.query(sql,new BeanPropertyRowMapper<TodoResponseDTO>(TodoResponseDTO.class));
+            TodoResponseDTO todoList= jdbcTemplate.queryForObject(sql,new BeanPropertyRowMapper<TodoResponseDTO>(TodoResponseDTO.class));
 
-            if(todoList == null || todoList.isEmpty()){
-                return 0;
+            if(todoList != null ){
+                Integer totalDoneItems= todoList.getTotalDoneItems();
+                Integer totalTodos= todoList.getTotalTodoItems();
+                log.info("total done items : {}, total todos : {}", totalDoneItems, totalTodos);
+                double percentageValue = (double) totalDoneItems / totalTodos;
+                log.info("Percentage value: {}, percent is : ", percentageValue, percentageValue*100);
+                dashBoardDTO.setTotalDone(todoList.getTotalDoneItems());
+                int percentage = (int) (percentageValue * 100);
+                dashBoardDTO.setTotalDoneItemPercentage(percentage);
             }
-            return todoList.size();
+
         }catch (Exception e) {
             log.error("An exception throw : ",e);
-            return 0;
+
         }
     }
 
-    public Integer getTotalInProgressAmount(LocalDate goalStartDate, LocalDate goalEndDate){
+    public Integer getTotalInProgressAmount(LocalDate goalStartDate, LocalDate goalEndDate, Integer userId){
         try{
             String sql="select td.id from tb_todo td inner join \n" +
                     "tb_todo_list tdl on td.id = tdl.todo_id\n" +
                     "WHERE (date(td.goal_start_date) >= date('"+goalStartDate+"') OR td.goal_start_date IS NULL)\n" +
                     "  AND ( date(td.goal_end_date) <= date('"+goalEndDate+"') OR td.goal_end_date IS NULL) \n" +
-                    "group by tdl.todo_id\n" +
+                    " and td.created_by_id = "+userId+
+                    " group by tdl.todo_id\n" +
                     "having count(tdl.id)> count(tdl.is_done);";
 
             List<TodoResponseDTO> todoList= jdbcTemplate.query(sql,new BeanPropertyRowMapper<TodoResponseDTO>(TodoResponseDTO.class));
@@ -140,7 +149,7 @@ public class TodoDBService implements ITodoDBService {
     }
 
 
-    public List<TodoResponseDTO> getAllOverDueItems(LocalDate goalStartDate, LocalDate goalEndDate){
+    public List<TodoResponseDTO> getAllOverDueItems(LocalDate goalStartDate, LocalDate goalEndDate, Integer userId){
         try{
 
             String sql ="select td.id id, td.todo_title title, td.goal_start_date goalStartDate, td.goal_end_date goalEndDate, count(tdl.id) totalTodoItems, \n" +
@@ -148,7 +157,8 @@ public class TodoDBService implements ITodoDBService {
                     "tb_todo_list tdl on td.id = tdl.todo_id\n" +
                     "WHERE ((td.goal_start_date >= '"+goalStartDate+"' OR td.goal_start_date IS NULL)\n" +
                     "  AND (td.goal_end_date < '"+goalEndDate+"' OR td.goal_end_date IS NULL) )\n" +
-                    "group by tdl.todo_id\n" +
+                    " and td.created_by_id = "+userId+
+                    " group by tdl.todo_id\n" +
                     "having count(tdl.id) > count(tdl.is_done);";
             List<TodoResponseDTO> todoList= jdbcTemplate.query(sql,new BeanPropertyRowMapper<TodoResponseDTO>(TodoResponseDTO.class));
             return todoList;
@@ -158,7 +168,7 @@ public class TodoDBService implements ITodoDBService {
         }
     }
 
-    public List<TodoResponseDTO> getRecentBoard(LocalDate goalStartDate, LocalDate goalEndDate){
+    public List<TodoResponseDTO> getRecentBoard(LocalDate goalStartDate, LocalDate goalEndDate, Integer userId){
         try{
 
             String sql ="select td.id id, td.todo_title title, td.goal_start_date goalStartDate, td.goal_end_date goalEndDate, count(tdl.id) totalTodoItems, \n" +
@@ -166,7 +176,8 @@ public class TodoDBService implements ITodoDBService {
                     "tb_todo_list tdl on td.id = tdl.todo_id\n" +
                     "WHERE ((td.goal_start_date >= '"+goalStartDate+"' OR td.goal_start_date IS NULL)\n" +
                     "  AND (td.goal_end_date <= '"+goalEndDate+"' OR td.goal_end_date IS NULL) )\n" +
-                    "group by tdl.todo_id ";
+                    " and td.created_by_id = "+userId+
+                    " group by tdl.todo_id ";
 
             List<TodoResponseDTO> todoList= jdbcTemplate.query(sql,new BeanPropertyRowMapper<TodoResponseDTO>(TodoResponseDTO.class));
             return todoList;
@@ -177,18 +188,17 @@ public class TodoDBService implements ITodoDBService {
     }
 
     @Override
-    public DashBoardDTO getDashBoardValue(LocalDate goalStartDate, LocalDate goalEndDate) {
+    public DashBoardDTO getDashBoardValue(LocalDate goalStartDate, LocalDate goalEndDate,  Integer userId) {
         try{
             DashBoardDTO dashBoardDTO = new DashBoardDTO();
-            Integer totalInprogress = getTotalInProgressAmount(goalStartDate, goalEndDate);
-            Integer totalDone = getTotalDoneTodosAmount(goalStartDate, goalEndDate);
-            List<TodoResponseDTO> responseDTOS = getAllOverDueItems(goalStartDate, goalEndDate);
+            Integer totalInprogress = getTotalInProgressAmount(goalStartDate, goalEndDate,userId);
+            getTotalDoneTodosAmount(goalStartDate, goalEndDate,userId,dashBoardDTO);
+            List<TodoResponseDTO> responseDTOS = getAllOverDueItems(goalStartDate, goalEndDate,userId);
             LocalDate today = LocalDate.now();
             LocalDate last21DaysBefore = today.minusDays(21);
-            List<TodoResponseDTO> recentBoardDTOS = getRecentBoard(last21DaysBefore, today);
+            List<TodoResponseDTO> recentBoardDTOS = getRecentBoard(last21DaysBefore, today,userId);
 
             dashBoardDTO.setTotalInprogress(totalInprogress);
-            dashBoardDTO.setTotalDone(totalDone);
             dashBoardDTO.setTodoResponseList(responseDTOS);
             dashBoardDTO.setRecentTodos(recentBoardDTOS);
 

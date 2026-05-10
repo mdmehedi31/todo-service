@@ -17,5 +17,5 @@ public interface ITodoDBService {
     public List<TodoEntity> getAllTodoByUserId(Integer userId);
     public TodoEntity addTodo(TodoEntity todoEntity);
     public List<TodoResponseDTO> getAllTodosByCreator(Integer userId);
-    public DashBoardDTO getDashBoardValue(LocalDate goalStartDate, LocalDate goalEndDate);
+    public DashBoardDTO getDashBoardValue(LocalDate goalStartDate, LocalDate goalEndDate,  Integer userId);
 }

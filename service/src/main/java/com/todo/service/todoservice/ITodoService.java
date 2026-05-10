@@ -2,6 +2,7 @@ package com.todo.service.todoservice;
 
 import com.todom.library.dto.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface ITodoService {
@@ -18,5 +19,6 @@ public interface ITodoService {
     public List<TodoListRequestDTO> getAllTodoListByTodoId(Integer todoId);
 
     public ApiResponse addAiGeneratedTodoList(TodoDTO todoDTO, Integer createdById);
+    public DashBoardDTO getDashboardDataWithinDate(LocalDate startDate, LocalDate endDate, Integer userId);
 
 }

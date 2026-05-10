@@ -17,6 +17,7 @@ import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
@@ -296,6 +297,18 @@ public class TodoService implements ITodoService{
             return new ApiResponse(SuccessOrFailedEnum.FAILED);
         }
 
+    }
+
+    @Override
+    public DashBoardDTO getDashboardDataWithinDate(LocalDate startDate, LocalDate endDate,  Integer userId) {
+        try{
+
+            return  this.todoDBService.getDashBoardValue(startDate, endDate,userId);
+        }catch (Exception e){
+            log.error("An Exception thrown : ",e);
+        }
+
+        return null;
     }
 
     private TodoListRequestDTO  convertTodoListEntityToTodoResponseDTO(TodoListEntity todoListEntity) {
