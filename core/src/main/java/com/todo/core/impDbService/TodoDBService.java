@@ -187,6 +187,27 @@ public class TodoDBService implements ITodoDBService {
         }
     }
 
+
+    public List<TodoResponseDTO> getOverDueTodos(LocalDate goalStartDate, LocalDate goalEndDate, Integer userId){
+        try{
+
+            String sql =" select td.todo_title title, td.goal_start_date goalStartDate, td.goal_end_date goalEndDate,count(tdl.id) totalTodoItems, \n" +
+                    "sum(if(tdl.is_done is null or tdl.is_done =0, 0,1)) totalDoneItems from tb_todo td inner join \n" +
+                    "tb_todo_list tdl on td.id = tdl.todo_id\n" +
+                    "WHERE (date(td.goal_end_date) >= date('"+goalStartDate+"') OR td.goal_end_date IS NULL)\n" +
+                    "  AND ( date(td.goal_end_date) <= date('"+goalEndDate+"') OR td.goal_end_date IS NULL) \n" +
+                    " and td.created_by_id = "+userId +
+                    " group by tdl.todo_id";
+
+            List<TodoResponseDTO> todoList= jdbcTemplate.query(sql,new BeanPropertyRowMapper<TodoResponseDTO>(TodoResponseDTO.class));
+            return todoList;
+        }catch (Exception e){
+            log.error("An exception thrown : ",e);
+            return new ArrayList<>();
+        }
+    }
+
+
     @Override
     public DashBoardDTO getDashBoardValue(LocalDate goalStartDate, LocalDate goalEndDate,  Integer userId) {
         try{
@@ -197,10 +218,11 @@ public class TodoDBService implements ITodoDBService {
             LocalDate today = LocalDate.now();
             LocalDate last21DaysBefore = today.minusDays(21);
             List<TodoResponseDTO> recentBoardDTOS = getRecentBoard(last21DaysBefore, today,userId);
-
+            List<TodoResponseDTO> overDueTodos = getOverDueTodos(goalStartDate, goalEndDate,userId);
             dashBoardDTO.setTotalInprogress(totalInprogress);
             dashBoardDTO.setTodoResponseList(responseDTOS);
             dashBoardDTO.setRecentTodos(recentBoardDTOS);
+            dashBoardDTO.setOverDueTodos(overDueTodos);
 
             return dashBoardDTO;
         }
