@@ -109,13 +109,14 @@ public class TodoDBService implements ITodoDBService {
             TodoResponseDTO todoList= jdbcTemplate.queryForObject(sql,new BeanPropertyRowMapper<TodoResponseDTO>(TodoResponseDTO.class));
 
             if(todoList != null ){
-                Integer totalDoneItems= todoList.getTotalDoneItems();
-                Integer totalTodos= todoList.getTotalTodoItems();
+                Integer totalDoneItems= todoList.getTotalDoneItems() !=null?todoList.getTotalDoneItems():0;
+                Integer totalTodos= todoList.getTotalTodoItems() !=null ? todoList.getTotalTodoItems() :0;
                 log.info("total done items : {}, total todos : {}", totalDoneItems, totalTodos);
                 double percentageValue = (double) totalDoneItems / totalTodos;
-                log.info("Percentage value: {}, percent is : ", percentageValue, percentageValue*100);
+                log.info("Percentage value: {}, percent is : {}", percentageValue, percentageValue*100);
                 dashBoardDTO.setTotalDone(todoList.getTotalDoneItems());
                 int percentage = (int) (percentageValue * 100);
+                log.info("Percentage value is : {}", percentage);
                 dashBoardDTO.setTotalDoneItemPercentage(percentage);
             }
 
