@@ -3,12 +3,16 @@ package com.todo.core.entity;
 
 import com.todo.core.utils.DBUtils;
 import jakarta.persistence.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.List;
 
 @Entity(name = DBUtils.TB_USER)
-public class UserEntity extends AbstractIdEntity {
+public class UserEntity extends AbstractIdEntity implements UserDetails {
 
     @Column(name = "full_name")
     private String fullName;
@@ -73,8 +77,18 @@ public class UserEntity extends AbstractIdEntity {
         this.email = email;
     }
 
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of();
+    }
+
     public String getPassword() {
         return password;
+    }
+
+    @Override
+    public String getUsername() {
+        return "";
     }
 
     public void setPassword(String password) {
