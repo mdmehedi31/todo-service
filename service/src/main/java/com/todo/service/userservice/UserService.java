@@ -4,12 +4,16 @@ import com.todo.core.dbservice.IUserDBService;
 import com.todo.core.entity.UserEntity;
 import com.todo.core.exceptionhandler.InvalidInputException;
 import com.todo.core.exceptionhandler.NotFoundException;
-import com.todom.library.dto.ApiResponse;
-import com.todom.library.dto.UserDTO;
-import com.todom.library.dto.UserRegistrationDTO;
+import com.todo.core.impDbService.UserDBService;
+import com.todo.core.repository.IUserRepository;
+import com.todo.service.config.security.JwtAuthService;
+import com.todom.library.dto.*;
 import com.todom.library.enums.SuccessOrFailedEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
@@ -21,11 +25,19 @@ import java.util.*;
 public class UserService implements IUserService {
 
 
+    private final UserDBService userDBService;
     private IUserDBService iUserDBService;
-
-    public UserService(IUserDBService iUserDBService) {
+    private PasswordEncoder passwordEncoder;
+    private JwtAuthService jwtAuthService;
+    private AuthenticationManager authenticationManager;
+    public UserService(IUserDBService iUserDBService, PasswordEncoder passwordEncoder,
+                       UserDBService userDBService, JwtAuthService jwtAuthService,
+                       AuthenticationManager authenticationManager) {
         this.iUserDBService = iUserDBService;
-
+        this.passwordEncoder = passwordEncoder;
+        this.userDBService = userDBService;
+        this.jwtAuthService = jwtAuthService;
+        this.authenticationManager = authenticationManager;
     }
     private final Logger log = LoggerFactory.getLogger(UserService.class);
 
@@ -147,6 +159,60 @@ public class UserService implements IUserService {
         }
     }
 
+    @Override
+    public UserAuthInfo loginUser(UserLoginDTO userLoginDto) {
+        UserAuthInfo userAuthInfo= new UserAuthInfo();
+        UserDTO userDTO=new UserDTO();
+
+        try{
+            if(userLoginDto==null || userLoginDto.getEmail()==null){
+                userAuthInfo.setMessage("User registration info invalid");
+                return userAuthInfo;
+            }
+
+
+          //  authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userLoginDto.getEmail(), userLoginDto.getPassword()));
+            UserEntity userEntity=userDBService.getUserByEmail(userLoginDto.getEmail());
+
+            if(userEntity==null){
+                userAuthInfo.setMessage("User not found with this email");
+                return userAuthInfo;
+            }
+
+
+            String endCodedPassword=passwordEncoder.encode(userLoginDto.getPassword());
+
+
+            log.info("Endcoding password : " + endCodedPassword+", request pass : " +userEntity.getPassword());
+
+           boolean isMatchPassword = passwordEncoder.matches(userLoginDto.getPassword(),userEntity.getPassword());
+            if(!isMatchPassword){
+                userAuthInfo.setMessage("Password does not match");
+                return userAuthInfo;
+            }
+
+            userDTO.setId(userEntity.getId());
+            userDTO.setEmail(userEntity.getEmail());
+
+            if(userEntity.getFullName() !=null) {
+                userDTO.setFullName(userEntity.getFullName());
+            }
+
+            if(userEntity.getPhoneNo()!=null) {
+                userDTO.setPhoneNo(userEntity.getPhoneNo());
+            }
+
+            Map<String, String> jwt =jwtAuthService.getJwtToken(userLoginDto);
+           // userAuthInfo.setJwtToken(jwt.get("token"));
+            userAuthInfo.setJwtTokenValue(jwt);
+            userAuthInfo.setUser(userDTO);
+            return userAuthInfo;
+        }catch (Exception e){
+            log.error("An exception thrown : ",e);
+         throw e;
+        }
+    }
+
     private UserEntity userDTOToEntity(UserRegistrationDTO userDTO, UserEntity userEntity) {
 
         if(userDTO != null){
@@ -160,7 +226,8 @@ public class UserService implements IUserService {
                 userEntity.setPhoneNo(userDTO.getPhoneNo());
             }
             if ( userDTO.getPassword() != null) {
-                userEntity.setPassword(userDTO.getPassword());
+
+                userEntity.setPassword(passwordEncoder.encode(userDTO.getPassword()));
             }
 
             if (userDTO.getImage() != null) {

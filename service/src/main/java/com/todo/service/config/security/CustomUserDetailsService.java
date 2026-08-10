@@ -1,6 +1,7 @@
-package com.todo.service.config;
+package com.todo.service.config.security;
 
 
+import com.todo.core.entity.UserEntity;
 import com.todo.core.repository.IUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,7 +16,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     private IUserRepository userRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public UserEntity loadUserByUsername(String username) throws UsernameNotFoundException {
         return userRepository.findUserEntityByEmail(username);
     }
 }

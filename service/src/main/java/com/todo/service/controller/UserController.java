@@ -19,12 +19,6 @@ public class UserController {
     private IUserService userService;
 
     private final Logger log = LoggerFactory.getLogger(UserController.class);
-    @PostMapping("/create")
-    public ResponseEntity<ApiResponse> createNewUser(@RequestBody UserRegistrationDTO userRegistrationDTO) {
-        log.info("Creating new user");
-        ApiResponse response=userService.createUser(userRegistrationDTO);
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
-    }
 
     @GetMapping("/get")
     public ResponseEntity<UserDTO> getUserByEmailOrUserId(@RequestParam(required = false) String email,
