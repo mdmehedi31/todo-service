@@ -5,14 +5,14 @@ import com.todo.core.entity.UserEntity;
 import com.todo.core.exceptionhandler.InvalidInputException;
 import com.todo.core.exceptionhandler.NotFoundException;
 import com.todo.core.impDbService.UserDBService;
-import com.todo.core.repository.IUserRepository;
 import com.todo.service.config.security.JwtAuthService;
-import com.todom.library.dto.*;
+import com.todom.library.dto.ApiResponse;
+import com.todom.library.dto.UserDTO;
+import com.todom.library.dto.UserRegistrationDTO;
 import com.todom.library.enums.SuccessOrFailedEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
