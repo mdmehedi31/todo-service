@@ -6,9 +6,7 @@ import com.todo.core.exceptionhandler.InvalidInputException;
 import com.todo.core.exceptionhandler.NotFoundException;
 import com.todo.core.impDbService.UserDBService;
 import com.todo.service.config.security.JwtAuthService;
-import com.todom.library.dto.ApiResponse;
-import com.todom.library.dto.UserDTO;
-import com.todom.library.dto.UserRegistrationDTO;
+import com.todom.library.dto.*;
 import com.todom.library.enums.SuccessOrFailedEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -169,19 +167,14 @@ public class UserService implements IUserService {
                 userAuthInfo.setMessage("User registration info invalid");
                 return userAuthInfo;
             }
-
-
-          //  authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userLoginDto.getEmail(), userLoginDto.getPassword()));
-            UserEntity userEntity=userDBService.getUserByEmail(userLoginDto.getEmail());
+           UserEntity userEntity=userDBService.getUserByEmail(userLoginDto.getEmail());
 
             if(userEntity==null){
                 userAuthInfo.setMessage("User not found with this email");
                 return userAuthInfo;
             }
 
-
             String endCodedPassword=passwordEncoder.encode(userLoginDto.getPassword());
-
 
             log.info("Endcoding password : " + endCodedPassword+", request pass : " +userEntity.getPassword());
 
@@ -202,9 +195,13 @@ public class UserService implements IUserService {
                 userDTO.setPhoneNo(userEntity.getPhoneNo());
             }
 
+            if(userEntity.getTimeZone() !=null)
+                userDTO.setUserTimeZone(userEntity.getTimeZone());
+
+                userDTO.setIsBlocked(userEntity.getIsBlocked());
+
             Map<String, String> jwt =jwtAuthService.getJwtToken(userLoginDto);
-           // userAuthInfo.setJwtToken(jwt.get("token"));
-            userAuthInfo.setJwtTokenValue(jwt);
+           userAuthInfo.setJwtToken(jwt.get("token"));
             userAuthInfo.setUser(userDTO);
             return userAuthInfo;
         }catch (Exception e){

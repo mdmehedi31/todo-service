@@ -6,7 +6,6 @@ public class UserAuthInfo {
 
     private String jwtToken;
     private UserDTO user;
-    private Map<String, String> jwtTokenValue;
     private String message;
 
     public String getMessage() {
@@ -33,11 +32,4 @@ public class UserAuthInfo {
         this.user = user;
     }
 
-    public Map<String, String> getJwtTokenValue() {
-        return jwtTokenValue;
-    }
-
-    public void setJwtTokenValue(Map<String, String> jwtTokenValue) {
-        this.jwtTokenValue = jwtTokenValue;
-    }
 }
