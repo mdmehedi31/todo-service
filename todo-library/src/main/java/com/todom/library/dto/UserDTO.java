@@ -10,7 +10,7 @@ public class UserDTO extends UserRegistrationDTO {
     private Byte image;
     private Instant createdOn;
     private boolean isBlocked;
-
+    private String message;
 
     public String getFullName() {
         return fullName;
@@ -58,4 +58,11 @@ public class UserDTO extends UserRegistrationDTO {
         isBlocked = blocked;
     }
 
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
 }

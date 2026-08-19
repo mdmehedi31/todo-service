@@ -11,6 +11,7 @@ import com.todom.library.enums.SuccessOrFailedEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -40,7 +41,8 @@ public class UserService implements IUserService {
     private final Logger log = LoggerFactory.getLogger(UserService.class);
 
     @Override
-    public ApiResponse createUser(UserRegistrationDTO userRegistrationDTO) {
+    public UserAuthInfo createUser(UserRegistrationDTO userRegistrationDTO) {
+        UserAuthInfo userAuthInfo = new UserAuthInfo();
         try{
             log.info("From service createUser");
             if(userRegistrationDTO==null){
@@ -48,11 +50,11 @@ public class UserService implements IUserService {
             } else if (userRegistrationDTO.getEmail()==null) {
                 throw new InvalidInputException("Email can't be null");
             }
-        ApiResponse apiResponse = new ApiResponse();
+
         UserEntity userEntity=   iUserDBService.getUserByEmail(userRegistrationDTO.getEmail());
             if(userEntity !=null && userEntity.getId() !=null){
-                apiResponse.setCustomMessage("User already exist with this email");
-                return apiResponse;
+                userAuthInfo.setMessage("User already exist with this email");
+                return userAuthInfo;
             }
             UserEntity newUserEntity = new UserEntity();
             newUserEntity.setCreatedOn(Instant.now());
@@ -65,20 +67,27 @@ public class UserService implements IUserService {
 
             log.debug("From service createUser--> added user id is : " + saveResponse.getId());
             if(saveResponse!=null){
-                Map<String, Object> map = new HashMap<>();
+               /* Map<String, Object> map = new HashMap<>();
                 map.put("id", saveResponse.getId());
-                apiResponse.setOther(map);
-                apiResponse.setMessage(SuccessOrFailedEnum.SUCCESS);
+               // userDto.setOther(map);*/
+                UserDTO userDTO = userEntityToDTO(saveResponse);
+                Map<String, String> jwt =jwtAuthService.getJwtToken(new UserLoginDTO(userRegistrationDTO.getEmail(), userDTO.getPassword()));
+                userAuthInfo.setJwtToken(jwt.get("token"));
+                userAuthInfo.setUser(userDTO);
+
+                userAuthInfo.setMessage(SuccessOrFailedEnum.SUCCESS.name());
             }else{
-                apiResponse.setMessage(SuccessOrFailedEnum.FAILED);
+                userAuthInfo.setMessage(SuccessOrFailedEnum.FAILED.name());
             }
-            return apiResponse;
+            return userAuthInfo;
         }catch (InvalidInputException e){
             log.error("An exception thrown when creating a new user", e);
-            return new ApiResponse(SuccessOrFailedEnum.FAILED);
+            userAuthInfo.setMessage(SuccessOrFailedEnum.FAILED.name());
+            return userAuthInfo;
         } catch (Exception e){
             log.error("An exception thrown when creating a new user", e);
-            return new ApiResponse(SuccessOrFailedEnum.FAILED);
+            userAuthInfo.setMessage(SuccessOrFailedEnum.FAILED.name());
+            return userAuthInfo;
         }
 
     }
@@ -184,7 +193,7 @@ public class UserService implements IUserService {
                 return userAuthInfo;
             }
 
-            userDTO.setId(userEntity.getId());
+         /*   userDTO.setId(userEntity.getId());
             userDTO.setEmail(userEntity.getEmail());
 
             if(userEntity.getFullName() !=null) {
@@ -198,7 +207,9 @@ public class UserService implements IUserService {
             if(userEntity.getTimeZone() !=null)
                 userDTO.setUserTimeZone(userEntity.getTimeZone());
 
-                userDTO.setIsBlocked(userEntity.getIsBlocked());
+                userDTO.setIsBlocked(userEntity.getIsBlocked());*/
+
+            userDTO=userEntityToDTO(userEntity);
 
             Map<String, String> jwt =jwtAuthService.getJwtToken(userLoginDto);
            userAuthInfo.setJwtToken(jwt.get("token"));

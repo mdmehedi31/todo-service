@@ -25,8 +25,8 @@ public class UserAuthController {
 
 
     @PostMapping("/create")
-    public ResponseEntity<ApiResponse> createNewUser(@RequestBody UserRegistrationDTO userRegistrationDTO) {
-        ApiResponse response = userService.createUser(userRegistrationDTO);
+    public ResponseEntity<UserAuthInfo> createNewUser(@RequestBody UserRegistrationDTO userRegistrationDTO) {
+        UserAuthInfo response = userService.createUser(userRegistrationDTO);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
