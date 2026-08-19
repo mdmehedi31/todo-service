@@ -129,8 +129,8 @@ public class GoogleAuthService implements IGoogleAuthService{
     public UserDTO checkGoogleAccessTokenIsValidOrElseGetNewToken(Integer userId) throws IOException, GeneralSecurityException {
         try{
             UserDTO user = this.userService.getUserByEmailOrUserId(null, userId);
-            log.info("Expired date : {}, Now time is : {}, Expired token value is : {} ",user.getGoogleTokenExpiredAt(), Instant.now(),user.getGoogleTokenExpiredAt().isBefore(Instant.now()));
-            if(user!=null && user.getGoogleTokenExpiredAt().isAfter(Instant.now())){
+          //  log.info("Expired date : {}, Now time is : {}, Expired token value is : {} ",user.getGoogleTokenExpiredAt(), Instant.now(),user.getGoogleTokenExpiredAt().isBefore(Instant.now()));
+            if(user!=null &&  user.getGoogleTokenExpiredAt() !=null && user.getGoogleTokenExpiredAt().isAfter(Instant.now())){
                 log.info("When token is not expired : {}", user.getGoogleTokenExpiredAt());
                 return user;
             }
