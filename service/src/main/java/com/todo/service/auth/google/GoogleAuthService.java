@@ -60,9 +60,10 @@ public class GoogleAuthService implements IGoogleAuthService{
     }*/
 
 
-    public Map<String,String> getAuthUrl(Integer userId){
+    public ApiResponse getAuthUrl(Integer userId){
         try{
 
+            ApiResponse response = new ApiResponse();
             UserDTO userDTO =userService.getUserByEmailOrUserId(null, userId);
             String state="";
 
@@ -79,10 +80,11 @@ public class GoogleAuthService implements IGoogleAuthService{
           }
           authRequst.setAccessType("offline");
           String url= authRequst.build();
-            Map<String,String> redirectUrlMap=new HashMap<>();
+            Map<String,Object> redirectUrlMap=new HashMap<>();
             redirectUrlMap.put("url",url);
             log.info("New method -> redirect url is = "+url);
-            return redirectUrlMap;
+            response.setOther(redirectUrlMap);
+            return response;
         } catch (Exception e) {
             throw e;
         }
