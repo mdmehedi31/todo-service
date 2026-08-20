@@ -11,7 +11,6 @@ import com.todom.library.enums.SuccessOrFailedEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -71,7 +70,7 @@ public class UserService implements IUserService {
                 map.put("id", saveResponse.getId());
                // userDto.setOther(map);*/
                 UserDTO userDTO = userEntityToDTO(saveResponse);
-                Map<String, String> jwt =jwtAuthService.getJwtToken(new UserLoginDTO(userRegistrationDTO.getEmail(), userDTO.getPassword()));
+                Map<String, String> jwt =jwtAuthService.getJwtToken(new UserLoginDTO(userRegistrationDTO.getEmail(), userRegistrationDTO.getPassword()));
                 userAuthInfo.setJwtToken(jwt.get("token"));
                 userAuthInfo.setUser(userDTO);
 
