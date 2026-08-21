@@ -227,19 +227,21 @@ public class GoogleCalendarService implements IGoogleCalendarService {
 
             List<AttendeeDTO> attendees = new ArrayList<>();
 
-            for(EventAttendee eventAttendee : event.getAttendees()) {
-                AttendeeDTO attendeeDTO= new AttendeeDTO();
-               if(eventAttendee.getEmail() != null){
-                   attendeeDTO.setEmail(eventAttendee.getEmail());
-               }
+            if(event.getAttendees()!=null && event.getAttendees().size() > 0) {
+                for (EventAttendee eventAttendee : event.getAttendees()) {
+                    AttendeeDTO attendeeDTO = new AttendeeDTO();
+                    if (eventAttendee.getEmail() != null) {
+                        attendeeDTO.setEmail(eventAttendee.getEmail());
+                    }
 
-               if(eventAttendee.getSelf() != null){
-                   attendeeDTO.setSelf(eventAttendee.getSelf());
-               }
-               if(eventAttendee.getResponseStatus() != null){
-                   attendeeDTO.setResponseStatus(eventAttendee.getResponseStatus());
-               }
-                attendees.add(attendeeDTO);
+                    if (eventAttendee.getSelf() != null) {
+                        attendeeDTO.setSelf(eventAttendee.getSelf());
+                    }
+                    if (eventAttendee.getResponseStatus() != null) {
+                        attendeeDTO.setResponseStatus(eventAttendee.getResponseStatus());
+                    }
+                    attendees.add(attendeeDTO);
+                }
             }
             CalendarEventDTO calendarEventDTO= new CalendarEventDTO();
             calendarEventDTO.setSummary(event.getSummary());
@@ -248,14 +250,22 @@ public class GoogleCalendarService implements IGoogleCalendarService {
             calendarEventDTO.setCalendarUid(event.getICalUID());
             calendarEventDTO.setCreator(event.getCreator().getEmail());
             calendarEventDTO.setOrganizer(event.getOrganizer().getEmail());
-            LocalDateTime endTime = DateTimeUtil.convertEpochMilliToLocalDateTimeWithUserTimeZone(event.getEnd().getDateTime().getValue(), event.getEnd().getTimeZone());
-            calendarEventDTO.setEnd(endTime);
-            LocalDateTime startTime =  DateTimeUtil.convertEpochMilliToLocalDateTimeWithUserTimeZone(event.getStart().getDateTime().getValue(), event.getStart().getTimeZone());
-            calendarEventDTO.setStartDate(startTime);
-            calendarEventDTO.setAttendees(attendees);
-            LocalDateTime createdAt = DateTimeUtil.convertEpochMilliToLocalDateTimeWithUserTimeZone(event.getCreated().getValue(),null);
-            calendarEventDTO.setCreated(createdAt);
+            if(event != null){
+                if(event.getEnd()!=null  && event.getEnd().getDateTime()!=null) {
+                    LocalDateTime endTime = DateTimeUtil.convertEpochMilliToLocalDateTimeWithUserTimeZone(event.getEnd().getDateTime().getValue(), event.getEnd().getTimeZone());
+                    calendarEventDTO.setEnd(endTime);
+                }
 
+                if(event.getStart()!=null && event.getStart().getDateTime()!=null) {
+                    LocalDateTime startTime =  DateTimeUtil.convertEpochMilliToLocalDateTimeWithUserTimeZone(event.getStart().getDateTime().getValue(), event.getStart().getTimeZone());
+                    calendarEventDTO.setStartDate(startTime);
+                }
+            }
+            calendarEventDTO.setAttendees(attendees);
+            if (event.getCreated() != null) {
+                LocalDateTime createdAt = DateTimeUtil.convertEpochMilliToLocalDateTimeWithUserTimeZone(event.getCreated().getValue(),null);
+                calendarEventDTO.setCreated(createdAt);
+            }
            // calendarEventDTO.setTimeZone(event.getEnd().getTimeZone());
             String timeZone = event.getEnd().getTimeZone();
             calendarEventDTO.setTimeZone(timeZone);
