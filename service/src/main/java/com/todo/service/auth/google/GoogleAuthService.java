@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.api.client.googleapis.auth.oauth2.*;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
+import com.todo.core.entity.UserEntity;
 import com.todo.core.impDbService.UserDBService;
 import com.todo.service.userservice.IUserService;
 import com.todom.library.dto.ApiResponse;
@@ -87,6 +88,21 @@ public class GoogleAuthService implements IGoogleAuthService{
             return response;
         } catch (Exception e) {
             throw e;
+        }
+    }
+
+    @Override
+    public Boolean isGoogleCalendarConnected(Integer userId) {
+        try{
+            Boolean isConnected = false;
+            UserEntity user=userDBService.getUserByID(userId);
+            if(user !=null && user.getGoogleAccessToken() !=null && user.getGoogleResfreshToken() !=null) {
+                isConnected = true;
+            }
+            return isConnected;
+        }catch (Exception e){
+            log.error(e.getMessage());
+            return false;
         }
     }
 

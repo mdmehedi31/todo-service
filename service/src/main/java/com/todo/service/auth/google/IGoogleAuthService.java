@@ -13,4 +13,5 @@ public interface IGoogleAuthService {
     public ApiResponse saveUserGoogleCalendarConnectionCredential(String authCode, Integer userId);
     public UserDTO checkGoogleAccessTokenIsValidOrElseGetNewToken(Integer userId) throws IOException, GeneralSecurityException;
     public ApiResponse getAuthUrl(Integer userId);
+    public Boolean isGoogleCalendarConnected(Integer userId);
 }

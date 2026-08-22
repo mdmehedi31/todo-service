@@ -39,5 +39,10 @@ public class GoogleAuthController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @GetMapping("/google-cal-is-connected/{userId}")
+    public ResponseEntity<Boolean> isGoogleCalendarConnected(@PathVariable Integer userId){
+        Boolean isConnected= this.googleAuthService.isGoogleCalendarConnected(userId);
+        return new ResponseEntity<>(isConnected, HttpStatus.OK);
+    }
 
 }
