@@ -186,6 +186,8 @@ public class GoogleCalendarService implements IGoogleCalendarService {
     public List<CalendarEventDTO> getAllUsersEventsByUserId(Integer userId, Instant eventStartDate, Instant eventEndDate) {
         try {
             {
+
+                log.info("User id : {}, Start date : {}, End date : {}", userId, eventStartDate, eventEndDate);
                 UserDTO userDTO = this.googleAuthService.checkGoogleAccessTokenIsValidOrElseGetNewToken(userId);
                 if (userDTO != null) {
                     Calendar client = buildCalendarClient(userDTO.getGoogleAccessToken());

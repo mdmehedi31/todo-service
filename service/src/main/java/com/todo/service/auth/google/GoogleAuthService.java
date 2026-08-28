@@ -1,6 +1,7 @@
 package com.todo.service.auth.google;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.api.client.auth.oauth2.TokenResponseException;
 import com.google.api.client.googleapis.auth.oauth2.*;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
@@ -96,7 +97,8 @@ public class GoogleAuthService implements IGoogleAuthService{
         try{
             Boolean isConnected = false;
             UserEntity user=userDBService.getUserByID(userId);
-            if(user !=null && user.getGoogleAccessToken() !=null && user.getGoogleResfreshToken() !=null) {
+            if(user !=null && user.getGoogleAccessToken() !=null && user.getGoogleResfreshToken() !=null &&
+                    user.getGoogleTokenExpiresAt() !=null && user.getGoogleTokenExpiresAt().isAfter(Instant.now())) {
                 isConnected = true;
             }
             return isConnected;
@@ -188,6 +190,7 @@ public class GoogleAuthService implements IGoogleAuthService{
         try{
             if(user !=null && user.getGoogleRefreshToken()!=null) {
 
+                log.info("User and user refresh token are not valid");
                 GoogleTokenResponse refreshTokenRequest = new GoogleRefreshTokenRequest(GoogleNetHttpTransport.newTrustedTransport(),
                         GsonFactory.getDefaultInstance(),user.getGoogleRefreshToken(),clientId,clientSecret).execute();
 
@@ -196,6 +199,11 @@ public class GoogleAuthService implements IGoogleAuthService{
                 return user;
             }
             return null;
+        }
+        catch (TokenResponseException e){
+            log.error("Token response exception is : {}", e.getMessage());
+
+            throw e;
         }
         catch (Exception e) {
             throw e;
